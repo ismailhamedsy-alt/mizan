@@ -1,0 +1,21 @@
+Mizan Windows Release Source
+
+Build entry point:
+  ..\..\BUILD-MIZAN-WINDOWS.cmd
+
+Direct build script:
+  build-windows.cmd
+
+Run after build:
+  run-mizan.cmd
+
+Executable output:
+  dist\Mizan.exe
+
+Diagnostic:
+  diagnose-build.cmd
+
+Target:
+  Windows x64 / WPF / .NET 8 / self-contained single-file EXE
+
+Android reference source is included in the top-level android directory.

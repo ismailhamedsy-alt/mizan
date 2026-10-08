@@ -1,0 +1,11 @@
+الميزان Windows — النسخة المصححة بعد خطأ البناء
+
+هذه الحزمة مبنية على نفس النسخة التي أرسلت سجل الخطأ الخاص بها. تم إصلاح أخطاء AccountBalance وSyncImportCounts.
+
+البناء:
+شغّل 1-BUILD-MIZAN.cmd من المجلد الرئيسي.
+
+الناتج:
+desktop\mizan\dist\Mizan.exe
+
+إذا نجح Build انتقل مباشرة إلى تشغيل Mizan.exe.

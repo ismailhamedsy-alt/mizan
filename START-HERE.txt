@@ -1,0 +1,20 @@
+MIZAN WINDOWS - BUILD PLATFORM
+
+This package now contains one build platform.
+
+LOCAL BUILD:
+  1-BUILD-MIZAN.cmd
+
+RESULT:
+  desktop\mizan\dist\Mizan.exe
+
+RUN:
+  2-RUN-MIZAN.cmd
+
+SMOKE TEST:
+  powershell -ExecutionPolicy Bypass -File build-platform\SmokeTest.ps1
+
+CI:
+  .github\workflows\windows-build.yml
+
+The project pins .NET SDK 8.0.413 in global.json.
