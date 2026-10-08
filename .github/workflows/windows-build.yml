@@ -1,0 +1,49 @@
+name: Mizan Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'desktop/mizan/**'
+      - 'build-platform/**'
+      - 'global.json'
+      - '1-BUILD-MIZAN.cmd'
+      - '.github/workflows/windows-build.yml'
+  pull_request:
+    paths:
+      - 'desktop/mizan/**'
+      - 'build-platform/**'
+      - 'global.json'
+      - '1-BUILD-MIZAN.cmd'
+      - '.github/workflows/windows-build.yml'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0.413
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.413
+
+      - name: Build and publish
+        shell: pwsh
+        run: ./build-platform/Build.ps1
+
+      - name: Smoke test published EXE
+        shell: pwsh
+        run: ./build-platform/SmokeTest.ps1
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mizan-Windows-x64
+          path: |
+            desktop/mizan/dist/Mizan.exe
+            desktop/mizan/dist/BUILD-MANIFEST.txt
+            desktop/mizan/dist/build.log
+          if-no-files-found: error
