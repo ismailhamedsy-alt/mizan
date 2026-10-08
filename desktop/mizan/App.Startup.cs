@@ -13,6 +13,16 @@ public partial class App
         try
         {
             base.OnStartup(e);
+            Services.LegacyLoginMigration.EnsureDefaultAdmin();
+
+            if (e.Args.Any(a => string.Equals(a, "--self-test-login", StringComparison.OrdinalIgnoreCase)))
+            {
+                if (!Services.LegacyLoginMigration.SelfTestLogin())
+                    throw new InvalidOperationException("Default login self-test failed.");
+                Shutdown(0);
+                return;
+            }
+
             var login = new LoginWindow();
             if (login.ShowDialog() == true)
             {
@@ -72,7 +82,6 @@ public partial class App
         }
         catch
         {
-            // Never throw from the crash logger.
         }
     }
 }
