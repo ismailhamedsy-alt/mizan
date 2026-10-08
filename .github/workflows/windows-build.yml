@@ -38,6 +38,10 @@ jobs:
         shell: pwsh
         run: ./build-platform/SmokeTest.ps1
 
+      - name: Startup smoke test
+        shell: pwsh
+        run: ./build-platform/StartupSmokeTest.ps1
+
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
