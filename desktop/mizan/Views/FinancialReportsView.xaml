@@ -1,0 +1,5 @@
+<UserControl x:Class="MizanDesktop.Views.FinancialReportsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FlowDirection="RightToLeft">
+<Grid Margin="4"><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+<StackPanel Orientation="Horizontal"><TextBlock Text="من" VerticalAlignment="Center"/><DatePicker x:Name="From" Width="145" Margin="8,0"/><TextBlock Text="إلى" VerticalAlignment="Center"/><DatePicker x:Name="To" Width="145" Margin="8,0"/><Button Content="ميزان المراجعة" Click="Trial_Click" Padding="14,7" Margin="8,0"/><Button Content="الأرباح والخسائر" Click="PL_Click" Padding="14,7" Margin="4,0"/><Button Content="الذمم" Click="Aging_Click" Padding="14,7" Margin="4,0"/></StackPanel>
+<StackPanel x:Name="Summary" Grid.Row="1" Orientation="Horizontal" Margin="0,16"><TextBlock x:Name="Info" FontSize="16" FontWeight="SemiBold"/></StackPanel>
+<DataGrid x:Name="Grid" Grid.Row="2" AutoGenerateColumns="True" IsReadOnly="True" CanUserAddRows="False"/></Grid></UserControl>

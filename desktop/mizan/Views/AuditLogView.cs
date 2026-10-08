@@ -1,0 +1,5 @@
+using System.Windows;
+using System.Windows.Controls;
+using MizanDesktop.Services;
+namespace MizanDesktop.Views;
+public sealed class AuditLogView:UserControl{public AuditLogView(AppRepository repo){FlowDirection=FlowDirection.RightToLeft;var root=new DockPanel{Margin=new Thickness(15)};var t=new TextBlock{Text="سجل التدقيق",FontSize=24,FontWeight=FontWeights.Bold};DockPanel.SetDock(t,Dock.Top);root.Children.Add(t);var g=new DataGrid{AutoGenerateColumns=false,IsReadOnly=true};g.Columns.Add(new DataGridTextColumn{Header="التاريخ",Binding=new System.Windows.Data.Binding("Date")});g.Columns.Add(new DataGridTextColumn{Header="العملية",Binding=new System.Windows.Data.Binding("Action")});g.Columns.Add(new DataGridTextColumn{Header="الوحدة",Binding=new System.Windows.Data.Binding("Entity")});g.Columns.Add(new DataGridTextColumn{Header="الوصف",Binding=new System.Windows.Data.Binding("Description")});g.Columns.Add(new DataGridTextColumn{Header="المستخدم",Binding=new System.Windows.Data.Binding("User")});g.ItemsSource=repo.AuditLog();root.Children.Add(g);Content=root;}}
