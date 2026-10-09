@@ -49,42 +49,52 @@ public partial class App
     private static bool SelfTestViews()
     {
         var repo = new Services.AppRepository();
-        FrameworkElement[] views =
+        var logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MizanDesktop");
+        Directory.CreateDirectory(logDir);
+        var logPath = Path.Combine(logDir, "ui-smoke.log");
+        File.WriteAllText(logPath, $"UI smoke started {DateTimeOffset.Now:O}\n");
+
+        (string Name, Func<FrameworkElement> Create)[] factories =
         [
-            new Views.AccountingView(repo),
-            new Views.AuditLogView(repo),
-            new Views.CashBoxView(repo),
-            new Views.CashTransferView(repo),
-            new Views.ChartOfAccountsView(repo),
-            new Views.CostLayersView(repo),
-            new Views.EnterpriseView(),
-            new Views.ExchangeRatesView(repo),
-            new Views.FinancialReportsView(repo),
-            new Views.InventoryAuditView(repo),
-            new Views.InventoryView(repo),
-            new Views.InvoicesView(repo, InvoiceType.Sale),
-            new Views.InvoicesView(repo, InvoiceType.Purchase),
-            new Views.InvoicesView(repo, InvoiceType.SaleReturn),
-            new Views.InvoicesView(repo, InvoiceType.PurchaseReturn),
-            new Views.InvoicesView(repo, InvoiceType.Quotation),
-            new Views.PartiesView(repo),
-            new Views.PaymentsView(repo),
-            new Views.ProductsView(repo),
-            new Views.ReportsView(repo),
-            new Views.SettingsView(repo),
-            new Views.StatementView(repo),
-            new Views.UsersView(repo)
+            ("LoginWindow", () => new LoginWindow()),
+            ("MainWindow", () => new MainWindow()),
+            ("AccountingView", () => new Views.AccountingView(repo)),
+            ("AuditLogView", () => new Views.AuditLogView(repo)),
+            ("CashBoxView", () => new Views.CashBoxView(repo)),
+            ("CashTransferView", () => new Views.CashTransferView(repo)),
+            ("ChartOfAccountsView", () => new Views.ChartOfAccountsView(repo)),
+            ("CostLayersView", () => new Views.CostLayersView(repo)),
+            ("EnterpriseView", () => new Views.EnterpriseView()),
+            ("ExchangeRatesView", () => new Views.ExchangeRatesView(repo)),
+            ("FinancialReportsView", () => new Views.FinancialReportsView(repo)),
+            ("InventoryAuditView", () => new Views.InventoryAuditView(repo)),
+            ("InventoryView", () => new Views.InventoryView(repo)),
+            ("Invoices-Sale", () => new Views.InvoicesView(repo, InvoiceType.Sale)),
+            ("Invoices-Purchase", () => new Views.InvoicesView(repo, InvoiceType.Purchase)),
+            ("Invoices-SaleReturn", () => new Views.InvoicesView(repo, InvoiceType.SaleReturn)),
+            ("Invoices-PurchaseReturn", () => new Views.InvoicesView(repo, InvoiceType.PurchaseReturn)),
+            ("Invoices-Quotation", () => new Views.InvoicesView(repo, InvoiceType.Quotation)),
+            ("PartiesView", () => new Views.PartiesView(repo)),
+            ("PaymentsView", () => new Views.PaymentsView(repo)),
+            ("ProductsView", () => new Views.ProductsView(repo)),
+            ("ReportsView", () => new Views.ReportsView(repo)),
+            ("SettingsView", () => new Views.SettingsView(repo)),
+            ("StatementView", () => new Views.StatementView(repo)),
+            ("UsersView", () => new Views.UsersView(repo))
         ];
 
-        foreach (var view in views)
+        foreach (var item in factories)
         {
-            view.Measure(new Size(900, 640));
-            view.Arrange(new Rect(0, 0, 900, 640));
-            view.UpdateLayout();
+            File.AppendAllText(logPath, $"Creating {item.Name}...\n");
+            var view = item.Create();
             if (view is UserControl control && control.Content is null)
-                throw new InvalidOperationException($"واجهة {view.GetType().Name} لم تنشئ محتوى.");
+                throw new InvalidOperationException($"واجهة {item.Name} لم تنشئ محتوى.");
+            if (view is Window window && window.Content is null)
+                throw new InvalidOperationException($"النافذة {item.Name} لم تنشئ محتوى.");
+            File.AppendAllText(logPath, $"OK {item.Name}\n");
         }
 
+        File.AppendAllText(logPath, $"UI smoke passed: {factories.Length} views/windows\n");
         return true;
     }
 
