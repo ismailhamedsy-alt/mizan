@@ -33,6 +33,12 @@ public partial class App
         catch (Exception ex)
         {
             LogStartupException(ex);
+            if (e.Args.Any(a => a.StartsWith("--self-test-", StringComparison.OrdinalIgnoreCase)))
+            {
+                Shutdown(90);
+                return;
+            }
+
             MessageBox.Show("حدث خطأ أثناء تشغيل الميزان.\n\n" + ex.Message +
                 "\n\nتم حفظ التفاصيل في startup-crash.log", "الميزان",
                 MessageBoxButton.OK, MessageBoxImage.Error);

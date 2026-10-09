@@ -545,9 +545,13 @@ VALUES($id,$no,$date,$type,$party,$name,$total,1,$discount,$fees,$feesnote,0,'DE
 
     private static void SeedPhase6Data(SqliteConnection c)
     {
-        using var q=c.CreateCommand();
-        q.CommandText="INSERT OR IGNORE INTO Users(Id,Name,Role,IsActive,CreatedAt) VALUES($id,$name,$role,1,$date)";
-        q.Parameters.AddWithValue("$id", "admin"); q.Parameters.AddWithValue("$name", "المدير"); q.Parameters.AddWithValue("$role", "ADMIN"); q.Parameters.AddWithValue("$date", DateTime.Now.ToString("O"));
+        // The login migration creates the canonical admin row. Only seed a legacy
+        // placeholder when the database genuinely has no administrator account.
+        using var q = c.CreateCommand();
+        q.CommandText = @"INSERT OR IGNORE INTO Users(Id,Name,Role,IsActive,CreatedAt)
+SELECT 'admin','المدير','ADMIN',1,$date
+WHERE NOT EXISTS (SELECT 1 FROM Users WHERE lower(Name)='admin' OR Name='المدير')";
+        q.Parameters.AddWithValue("$date", DateTime.Now.ToString("O"));
         q.ExecuteNonQuery();
     }
 
