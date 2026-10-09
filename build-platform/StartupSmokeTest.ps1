@@ -7,15 +7,19 @@ if (-not (Test-Path $Exe)) { throw "Mizan.exe not found: $Exe" }
 # Start from a clean first-run database.
 if (Test-Path $AppDir) { Remove-Item $AppDir -Recurse -Force }
 
-$self = Start-Process -FilePath $Exe -ArgumentList '--self-test-login' -PassThru -Wait
-if ($self.ExitCode -ne 0) {
-  throw "Login self-test failed with exit code $($self.ExitCode)."
+$tests = @('--self-test-login', '--self-test-legacy-login', '--self-test-login-recovery', '--self-test-views')
+foreach ($testArg in $tests) {
+  $self = Start-Process -FilePath $Exe -ArgumentList $testArg -PassThru -Wait
+  if ($self.ExitCode -ne 0) {
+    throw "Authentication test $testArg failed with exit code $($self.ExitCode)."
+  }
+  $crashLog = Join-Path $AppDir 'startup-crash.log'
+  if (Test-Path $crashLog) {
+    $details = Get-Content $crashLog -Raw
+    throw ('Authentication test created a startup crash log:' + [Environment]::NewLine + $details)
+  }
 }
-
-if (Test-Path (Join-Path $AppDir 'startup-crash.log')) {
-  $details = Get-Content (Join-Path $AppDir 'startup-crash.log') -Raw
-  throw ('Login self-test created a startup crash log:' + [Environment]::NewLine + $details)
-}
+Write-Host 'Fresh login, legacy-account migration, and admin recovery tests passed.' -ForegroundColor Green
 
 # Reuse the initialized database and confirm normal UI startup.
 $p = Start-Process -FilePath $Exe -PassThru

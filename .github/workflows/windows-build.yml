@@ -25,10 +25,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8.0.413
+      - name: Setup .NET 10.0.112
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.413
+          dotnet-version: 10.0.112
+
+      - name: Validate UI, XAML, controls, and target framework
+        shell: pwsh
+        run: ./build-platform/ValidateUi.ps1
 
       - name: Build and publish
         shell: pwsh

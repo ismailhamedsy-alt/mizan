@@ -9,8 +9,8 @@ $Log = Join-Path $Dist 'build.log'
 if (-not (Test-Path $Project)) { throw "Project not found: $Project" }
 $dotnet = Get-Command dotnet -ErrorAction Stop
 $sdks = & $dotnet.Source --list-sdks
-$required = $sdks | Where-Object { $_ -match '^8\.0\.413\s' }
-if (-not $required) { throw '.NET SDK 8.0.413 is required. Install it and rerun.' }
+$required = $sdks | Where-Object { $_ -match '^10\.0\.112\s' }
+if (-not $required) { throw '.NET SDK 10.0.112 is required. Install it and rerun.' }
 
 Remove-Item (Join-Path $Work 'bin') -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item (Join-Path $Work 'obj') -Recurse -Force -ErrorAction SilentlyContinue
@@ -50,7 +50,7 @@ $sha = (Get-FileHash $Exe -Algorithm SHA256).Hash
 Copy-Item $Exe (Join-Path $Dist 'Mizan.exe') -Force
 @"
 Mizan Windows Build Artifact
-SDK: 8.0.413
+SDK: 10.0.112
 Runtime: win-x64
 Self-contained: true
 EXE: $Exe

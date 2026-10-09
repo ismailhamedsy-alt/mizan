@@ -29,7 +29,7 @@ public partial class ProductsView : UserControl
     private void EditProduct(Product? product)
     {
         var p = product ?? new Product();
-        var dialog = new Window { Title = product is null ? "إضافة منتج" : "تعديل منتج", Width = 520, Height = 560, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft, Background = System.Windows.Media.Brushes.White };
+        var dialog = new Window { Title = product is null ? "إضافة منتج" : "تعديل منتج", Width = 650, Height = 680, MinWidth = 580, MinHeight = 600, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft, Background = System.Windows.Media.Brushes.White };
         var panel = new StackPanel { Margin = new Thickness(25) };
         var fields = new (string, Action<TextBox>)[] {
             ("اسم المنتج", t => p.Name=t.Text), ("الكود", t=>p.Code=t.Text), ("الباركود", t=>p.Barcode=t.Text), ("الوحدة", t=>p.Unit=t.Text),

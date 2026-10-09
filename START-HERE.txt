@@ -1,8 +1,6 @@
-MIZAN WINDOWS - BUILD PLATFORM
+MIZAN WINDOWS - .NET 10
 
-This package now contains one build platform.
-
-LOCAL BUILD:
+BUILD:
   1-BUILD-MIZAN.cmd
 
 RESULT:
@@ -11,10 +9,15 @@ RESULT:
 RUN:
   2-RUN-MIZAN.cmd
 
-SMOKE TEST:
-  powershell -ExecutionPolicy Bypass -File build-platform\SmokeTest.ps1
+LOGIN DEFAULTS:
+  user: admin
+  PIN: 1234
 
-CI:
-  .github\workflows\windows-build.yml
+If the PIN is rejected, use "استعادة دخول المدير" on the login window.
+This resets the local admin credentials but does not delete invoices, products, or accounting data.
 
-The project pins .NET SDK 8.0.413 in global.json.
+Target framework: net10.0-windows
+SDK: 10.0.112
+Platform: win-x64, self-contained
+
+CI validates .NET 10 build/publish, XAML event bindings, fresh login, legacy-account migration, recovery, and normal UI startup.

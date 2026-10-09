@@ -1,16 +1,15 @@
-# Mizan Windows Build Platform
+# منصة بناء الميزان Windows
 
-هذه هي منصة البناء الموحدة للمشروع.
+- Target: `net10.0-windows`
+- SDK: `10.0.112`
+- SQLite provider: `Microsoft.Data.Sqlite 10.0.12`
+- Platform: `win-x64`, self-contained.
 
-## Local Windows
-1. ثبّت .NET SDK 8.0.413.
-2. شغّل `1-BUILD-MIZAN.cmd` من جذر المشروع.
-3. الناتج النهائي: `desktop\mizan\dist\Mizan.exe`.
-4. التشغيل: `2-RUN-MIZAN.cmd`.
-5. الاختبار السريع: `build-platform\SmokeTest.ps1`.
-6. السجل: `desktop\mizan\dist\build.log`.
+## البناء المحلي
+1. ثبّت .NET SDK 10.0.112.
+2. شغّل `1-BUILD-MIZAN.cmd` من جذر المستودع.
+3. الناتج `desktop\mizan\dist\Mizan.exe`.
+4. السجل `desktop\mizan\dist\build.log`.
 
-## CI
-يوجد workflow في `.github/workflows/windows-build.yml` يبني على Windows runner، ويتحقق من EXE، ويرفع Artifact باسم `Mizan-Windows-x64`.
-
-لا يعتبر الإصدار ناجحًا إلا بعد نجاح RESTORE + BUILD + PUBLISH + PE validation.
+## فحوصات CI
+تشمل فحص XML لكل XAML ومعالجات الأحداث، وفحص التنقل والتمرير والتباين، وRestore/Build/Publish، وفحص PE، واختبارات الدخول الجديد والحساب القديم والاستعادة، وإنشاء كل الواجهات الأساسية وإجراء Measure/Arrange لها، ثم اختبار التشغيل الطبيعي.

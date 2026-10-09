@@ -1,20 +1,13 @@
-# تشغيل الميزان على Windows
+# تشغيل الميزان على Windows — .NET 10
 
-بعد نجاح البناء ستجد التطبيق هنا:
-
+بعد نجاح البناء:
 `desktop\mizan\dist\Mizan.exe`
 
-ويمكنك تشغيله مباشرة بالنقر المزدوج.
+شغّل البناء من جذر المشروع:
+`1-BUILD-MIZAN.cmd`
 
-كما يوجد:
-- `dist\تشغيل-الميزان.cmd`
-- `dist\Mizan-Windows-x64.zip`
+للتشغيل لاحقًا:
+`2-RUN-MIZAN.cmd`
 
-السكربت `build-windows.cmd` يحذف مجلدات bin/obj/publish/dist القديمة قبل كل بناء، ثم:
-1. Restore
-2. Build Release
-3. Publish self-contained win-x64
-4. ينتج Mizan.exe واحدًا
-5. ينشئ ZIP للتوزيع
-
-إذا فشل البناء، شغّل `diagnose-build.cmd` وانسخ لي آخر 30 سطر من الناتج.
+يتطلب Windows 10/11 x64 و.NET SDK 10.0.112.
+عند تعذّر الدخول، استخدم زر «استعادة دخول المدير» في شاشة الدخول؛ لا يحذف البرنامج بيانات المحاسبة.
