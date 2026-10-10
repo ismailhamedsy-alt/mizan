@@ -10,7 +10,7 @@ public sealed class CashTransferView : UserControl
     public CashTransferView(AppRepository repo){_repo=repo;FlowDirection=FlowDirection.RightToLeft;Build();}
     void Build(){var root=new StackPanel{Margin=new Thickness(25)};root.Children.Add(new TextBlock{Text="تحويل وتصريف بين الصناديق",FontSize=24,FontWeight=FontWeights.Bold});
         Add(root,"الصندوق المصدر",_from);Add(root,"الصندوق المستلم",_to);Add(root,"المبلغ المصدر",_amount);Add(root,"سعر الصرف",_rate);Add(root,"ملاحظات",_notes);
-        var b=new Button{Content="تنفيذ التحويل",Padding=new Thickness(15),Margin=new Thickness(0,15,0,8)};b.Click+=DoTransfer;root.Children.Add(b);root.Children.Add(_preview);Content=root;LoadFunds();}
+        var b=new Button{Content="تنفيذ التحويل",Padding=new Thickness(15),Margin=new Thickness(0,15,0,8)};b.Click+=DoTransfer;root.Children.Add(b);root.Children.Add(_preview);Content=new ScrollViewer { Content=root, VerticalScrollBarVisibility=ScrollBarVisibility.Auto, HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled };LoadFunds();}
     void Add(Panel p,string label,Control c){p.Children.Add(new TextBlock{Text=label,Margin=new Thickness(0,10,0,4),FontWeight=FontWeights.SemiBold});if(c is TextBox t)t.Height=32;if(c is ComboBox cb)cb.Height=32;p.Children.Add(c);}
     void LoadFunds(){var funds=_repo.CashFunds().Select(x=>new FundItem(x.Id,x.Name,x.Currency,x.Balance)).ToList();_from.ItemsSource=funds;_to.ItemsSource=funds;_from.DisplayMemberPath="Name";_to.DisplayMemberPath="Name";if(funds.Count>0)_from.SelectedIndex=0;if(funds.Count>1)_to.SelectedIndex=1;}
     sealed record FundItem(string Id,string Name,string Currency,decimal Balance);

@@ -42,7 +42,7 @@ public partial class InvoicesView : UserControl
     private void Details_Click(object sender, RoutedEventArgs e)
     {
         if (Grid.SelectedItem is not Invoice invoice) { MessageBox.Show("اختر عملية أولاً."); return; }
-        var w = new Window { Title = $"تفاصيل {invoice.Number}", Width = 850, Height = 620, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft };
+        var w = new Window { Title = $"تفاصيل {invoice.Number}", Width = 1000, Height = 720, MinWidth = 720, MinHeight = 480, MaxWidth = SystemParameters.WorkArea.Width - 40, MaxHeight = SystemParameters.WorkArea.Height - 40, ResizeMode = ResizeMode.CanResize, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft };
         var root = new Grid { Margin = new Thickness(16) }; root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); root.RowDefinitions.Add(new RowDefinition()); root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.Children.Add(new TextBlock { Text = $"{WindowTitle(invoice.Type)} — {invoice.Number}\n{invoice.Date:g} | الطرف: {invoice.PartyName} | الدفع: {PaymentMethods.Label(invoice.PaymentMethod)}", FontSize = 16, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0,0,0,12) });
         var dg = new DataGrid { ItemsSource = invoice.Lines, AutoGenerateColumns = false, IsReadOnly = true, CanUserAddRows = false };
@@ -70,7 +70,9 @@ public partial class InvoicesView : UserControl
         var w = new Window
         {
             Title = WindowTitle(_baseType),
-            Width = 1000, Height = 760, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Width = 1180, Height = 820, MinWidth = 900, MinHeight = 600,
+            MaxWidth = SystemParameters.WorkArea.Width - 40, MaxHeight = SystemParameters.WorkArea.Height - 40,
+            ResizeMode = ResizeMode.CanResize, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner,
             FlowDirection = FlowDirection.RightToLeft
         };
 
@@ -111,7 +113,7 @@ public partial class InvoicesView : UserControl
         System.Windows.Controls.Grid.SetColumn(addButton, 3); addGrid.Children.Add(addButton); System.Windows.Controls.Grid.SetColumn(removeButton, 4); addGrid.Children.Add(removeButton);
         System.Windows.Controls.Grid.SetRow(addGrid, 1); root.Children.Add(addGrid);
 
-        var linesGrid = new DataGrid { AutoGenerateColumns = false, CanUserAddRows = false, IsReadOnly = true, Margin = new Thickness(0, 0, 0, 12) };
+        var linesGrid = new DataGrid { AutoGenerateColumns = false, CanUserAddRows = false, IsReadOnly = true, Height = 320, MinHeight = 180, Margin = new Thickness(0, 0, 0, 12), VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto };
         linesGrid.Columns.Add(new DataGridTextColumn { Header = "الصنف", Binding = new System.Windows.Data.Binding("ProductName"), Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
         linesGrid.Columns.Add(new DataGridTextColumn { Header = "الكمية", Binding = new System.Windows.Data.Binding("Quantity") { StringFormat = "N2" }, Width = 120 });
         linesGrid.Columns.Add(new DataGridTextColumn { Header = "السعر", Binding = new System.Windows.Data.Binding("UnitPrice") { StringFormat = "N2" }, Width = 130 });
@@ -159,7 +161,7 @@ public partial class InvoicesView : UserControl
             catch (Exception ex) { MessageBox.Show(ex.Message, "تعذر حفظ الفاتورة", MessageBoxButton.OK, MessageBoxImage.Error); }
         };
 
-        w.Content = root;
+        w.Content = new ScrollViewer { Content = root, VerticalScrollBarVisibility = ScrollBarVisibility.Auto, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto };
         w.ShowDialog();
     }
 

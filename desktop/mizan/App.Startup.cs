@@ -17,6 +17,7 @@ public partial class App
             Services.LegacyLoginMigration.EnsureDefaultAdmin();
 
             if (HasArg(e, "--self-test-login")) { Shutdown(Services.LegacyLoginMigration.SelfTestLogin() ? 0 : 21); return; }
+            if (HasArg(e, "--self-test-login-upgrade")) { Shutdown(Services.LegacyLoginMigration.SelfTestLoginUpgrade() ? 0 : 25); return; }
             if (HasArg(e, "--self-test-legacy-login")) { Shutdown(Services.LegacyLoginMigration.SelfTestLegacyLogin() ? 0 : 22); return; }
             if (HasArg(e, "--self-test-login-recovery")) { Shutdown(Services.LegacyLoginMigration.SelfTestLoginRecovery() ? 0 : 23); return; }
             if (HasArg(e, "--self-test-views")) { Shutdown(SelfTestViews() ? 0 : 24); return; }

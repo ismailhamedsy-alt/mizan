@@ -42,6 +42,7 @@ function Invoke-MizanSelfTest([string]$Argument) {
 }
 
 Invoke-MizanSelfTest '--self-test-login'
+Invoke-MizanSelfTest '--self-test-login-upgrade'
 Invoke-MizanSelfTest '--self-test-legacy-login'
 Invoke-MizanSelfTest '--self-test-login-recovery'
 Invoke-MizanSelfTest '--self-test-views'

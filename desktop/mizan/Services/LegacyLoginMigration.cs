@@ -23,12 +23,12 @@ public static class LegacyLoginMigration
 
         // One-time compatibility migration: older Windows builds stored an admin
         // row with another name/hash, so PIN 1234 was rejected after upgrade.
-        if (!MigrationApplied(c, "default-admin-pin-v2"))
+        if (!MigrationApplied(c, "default-admin-pin-v3"))
         {
             ResetAdminInConnection(c);
             using var mark = c.CreateCommand();
             mark.CommandText = "INSERT OR IGNORE INTO AppMigrations(MigrationId,AppliedAt) VALUES($id,$date)";
-            mark.Parameters.AddWithValue("$id", "default-admin-pin-v2");
+            mark.Parameters.AddWithValue("$id", "default-admin-pin-v3");
             mark.Parameters.AddWithValue("$date", DateTimeOffset.Now.ToString("O"));
             mark.ExecuteNonQuery();
             return;
@@ -89,7 +89,7 @@ public static class LegacyLoginMigration
         if (string.IsNullOrWhiteSpace(id))
         {
             using var findLegacy = c.CreateCommand();
-            findLegacy.CommandText = "SELECT Id FROM Users WHERE Role='ADMIN' AND Name='المدير' ORDER BY CASE WHEN Id='admin' THEN 0 ELSE 1 END LIMIT 1";
+            findLegacy.CommandText = "SELECT Id FROM Users WHERE Role='ADMIN' ORDER BY CASE WHEN Id='admin' THEN 0 WHEN Name='المدير' THEN 1 ELSE 2 END LIMIT 1";
             id = Convert.ToString(findLegacy.ExecuteScalar());
         }
 
@@ -161,6 +161,23 @@ public static class LegacyLoginMigration
 
     public static bool SelfTestLogin()
     {
+        EnsureDefaultAdmin();
+        return new EnterpriseAccountingService().Login("admin", DefaultPin()) is { Role: "ADMIN" };
+    }
+
+    public static bool SelfTestLoginUpgrade()
+    {
+        EnsureDefaultAdmin();
+        using (var c = new SqliteConnection($"Data Source={DatabasePath}"))
+        {
+            c.Open();
+            using var q = c.CreateCommand();
+            q.CommandText = @"DELETE FROM AppMigrations WHERE MigrationId='default-admin-pin-v3';
+INSERT OR IGNORE INTO AppMigrations(MigrationId,AppliedAt) VALUES('default-admin-pin-v2',$date);
+UPDATE Users SET PinHash='old-invalid-hash' WHERE Name='admin';";
+            q.Parameters.AddWithValue("$date", DateTimeOffset.Now.ToString("O"));
+            q.ExecuteNonQuery();
+        }
         EnsureDefaultAdmin();
         return new EnterpriseAccountingService().Login("admin", DefaultPin()) is { Role: "ADMIN" };
     }

@@ -29,13 +29,13 @@ public partial class ProductsView : UserControl
     private void EditProduct(Product? product)
     {
         var p = product ?? new Product();
-        var dialog = new Window { Title = product is null ? "إضافة منتج" : "تعديل منتج", Width = 650, Height = 680, MinWidth = 580, MinHeight = 600, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft, Background = System.Windows.Media.Brushes.White };
+        var dialog = new Window { Title = product is null ? "إضافة منتج" : "تعديل منتج", Width = 760, Height = 760, MinWidth = 560, MinHeight = 500, MaxHeight = SystemParameters.WorkArea.Height - 40, ResizeMode = ResizeMode.CanResize, Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner, FlowDirection = FlowDirection.RightToLeft, Background = System.Windows.Media.Brushes.White };
         var panel = new StackPanel { Margin = new Thickness(25) };
         var fields = new (string, Action<TextBox>)[] {
             ("اسم المنتج", t => p.Name=t.Text), ("الكود", t=>p.Code=t.Text), ("الباركود", t=>p.Barcode=t.Text), ("الوحدة", t=>p.Unit=t.Text),
             ("سعر الشراء", t=>p.PurchasePrice=Parse(t.Text)), ("سعر البيع", t=>p.SalePrice=Parse(t.Text)), ("الكمية", t=>p.Quantity=Parse(t.Text)), ("حد إعادة الطلب", t=>p.MinQuantity=Parse(t.Text))};
         foreach (var (label,set) in fields) { panel.Children.Add(new TextBlock { Text=label, Margin=new Thickness(0,8,0,4), FontWeight=FontWeights.SemiBold }); var t=new TextBox { Text=Value(p,label,p), Padding=new Thickness(8) }; t.Tag=set; panel.Children.Add(t); }
-        var save=new Button { Content="حفظ", Padding=new Thickness(15,10,15,10), Margin=new Thickness(0,20,0,0) }; save.Click += (_,_) => { foreach(var tb in panel.Children.OfType<TextBox>()) ((Action<TextBox>)tb.Tag)(tb); if(string.IsNullOrWhiteSpace(p.Name)){MessageBox.Show("اسم المنتج مطلوب");return;} _repo.SaveProduct(p); dialog.Close(); LoadItems(SearchBox.Text); }; panel.Children.Add(save); dialog.Content=panel; dialog.ShowDialog();
+        var save=new Button { Content="حفظ", Padding=new Thickness(15,10,15,10), Margin=new Thickness(0,20,0,0) }; save.Click += (_,_) => { foreach(var tb in panel.Children.OfType<TextBox>()) ((Action<TextBox>)tb.Tag)(tb); if(string.IsNullOrWhiteSpace(p.Name)){MessageBox.Show("اسم المنتج مطلوب");return;} _repo.SaveProduct(p); dialog.Close(); LoadItems(SearchBox.Text); }; panel.Children.Add(save); dialog.Content=new ScrollViewer { Content=panel, VerticalScrollBarVisibility=ScrollBarVisibility.Auto, HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled }; dialog.ShowDialog();
     }
     private static decimal Parse(string s) => decimal.TryParse(s, out var v) ? v : 0;
     private static string Value(Product p,string label,Product _) => label switch { "اسم المنتج"=>p.Name,"الكود"=>p.Code,"الباركود"=>p.Barcode,"الوحدة"=>p.Unit,"سعر الشراء"=>p.PurchasePrice.ToString("0.##"),"سعر البيع"=>p.SalePrice.ToString("0.##"),"الكمية"=>p.Quantity.ToString("0.##"),"حد إعادة الطلب"=>p.MinQuantity.ToString("0.##"),_=>""};
