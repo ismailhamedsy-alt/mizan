@@ -95,9 +95,30 @@ PaymentMethod=CASE WHEN IsCredit=1 THEN 'DEFERRED' ELSE 'CASH' END WHERE PaidAmo
 
     private static void AddColumn(SqliteConnection c, string table, string column, string definition)
     {
-        using var q = c.CreateCommand();
-        q.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {definition}";
-        try { q.ExecuteNonQuery(); } catch (SqliteException ex) when (ex.SqliteErrorCode == 1) { }
+        // Do not swallow every SQLite error code 1: it can mean "no such table",
+        // which previously let startup continue until LoadAll failed much later.
+        using (var checkTable = c.CreateCommand())
+        {
+            checkTable.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=$table";
+            checkTable.Parameters.AddWithValue("$table", table);
+            if (Convert.ToInt32(checkTable.ExecuteScalar()) == 0)
+                throw new InvalidOperationException($"Required database table '{table}' was not created.");
+        }
+
+        using (var columns = c.CreateCommand())
+        {
+            columns.CommandText = $"PRAGMA table_info([{table}])";
+            using var reader = columns.ExecuteReader();
+            while (reader.Read())
+            {
+                if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+                    return;
+            }
+        }
+
+        using var alter = c.CreateCommand();
+        alter.CommandText = $"ALTER TABLE [{table}] ADD COLUMN [{column}] {definition}";
+        alter.ExecuteNonQuery();
     }
 
     private static void SeedBigModuleData(SqliteConnection c)

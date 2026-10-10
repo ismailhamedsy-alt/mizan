@@ -21,6 +21,19 @@ public static class LegacyLoginMigration
         c.Open();
         EnsureSchema(c);
 
+        // One-time compatibility migration: older Windows builds stored an admin
+        // row with another name/hash, so PIN 1234 was rejected after upgrade.
+        if (!MigrationApplied(c, "default-admin-pin-v2"))
+        {
+            ResetAdminInConnection(c);
+            using var mark = c.CreateCommand();
+            mark.CommandText = "INSERT OR IGNORE INTO AppMigrations(MigrationId,AppliedAt) VALUES($id,$date)";
+            mark.Parameters.AddWithValue("$id", "default-admin-pin-v2");
+            mark.Parameters.AddWithValue("$date", DateTimeOffset.Now.ToString("O"));
+            mark.ExecuteNonQuery();
+            return;
+        }
+
         using (var find = c.CreateCommand())
         {
             find.CommandText = "SELECT Id, COALESCE(PinHash,'') FROM Users WHERE Name='admin' LIMIT 1";
@@ -42,6 +55,7 @@ public static class LegacyLoginMigration
             }
         }
 
+        // Recover a legacy admin if its display name was localized by an older build.
         using (var legacy = c.CreateCommand())
         {
             legacy.CommandText = "SELECT Id, COALESCE(PinHash,'') FROM Users WHERE Role='ADMIN' AND (Id='admin' OR Name='المدير') ORDER BY CASE WHEN Id='admin' THEN 0 ELSE 1 END LIMIT 1";
@@ -52,7 +66,7 @@ public static class LegacyLoginMigration
                 var oldHash = reader.GetString(1);
                 reader.Close();
                 using var update = c.CreateCommand();
-                update.CommandText = "UPDATE Users SET Name='admin', PinHash=$pin, IsActive=1 WHERE Id=$id";
+                update.CommandText = "UPDATE Users SET Name='admin', PinHash=$pin, Role='ADMIN', IsActive=1 WHERE Id=$id";
                 update.Parameters.AddWithValue("$pin", string.IsNullOrWhiteSpace(oldHash) ? DefaultPinHash() : oldHash);
                 update.Parameters.AddWithValue("$id", id);
                 update.ExecuteNonQuery();
@@ -63,6 +77,42 @@ public static class LegacyLoginMigration
         CreateAdmin(c);
     }
 
+    private static void ResetAdminInConnection(SqliteConnection c)
+    {
+        string? id;
+        using (var find = c.CreateCommand())
+        {
+            find.CommandText = "SELECT Id FROM Users WHERE Name='admin' LIMIT 1";
+            id = Convert.ToString(find.ExecuteScalar());
+        }
+
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            using var findLegacy = c.CreateCommand();
+            findLegacy.CommandText = "SELECT Id FROM Users WHERE Role='ADMIN' AND Name='المدير' ORDER BY CASE WHEN Id='admin' THEN 0 ELSE 1 END LIMIT 1";
+            id = Convert.ToString(findLegacy.ExecuteScalar());
+        }
+
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            using var update = c.CreateCommand();
+            update.CommandText = "UPDATE Users SET Name='admin', Role='ADMIN', PinHash=$pin, IsActive=1 WHERE Id=$id";
+            update.Parameters.AddWithValue("$pin", DefaultPinHash());
+            update.Parameters.AddWithValue("$id", id);
+            update.ExecuteNonQuery();
+            return;
+        }
+
+        CreateAdmin(c);
+    }
+
+    private static bool MigrationApplied(SqliteConnection c, string id)
+    {
+        using var q = c.CreateCommand();
+        q.CommandText = "SELECT COUNT(*) FROM AppMigrations WHERE MigrationId=$id";
+        q.Parameters.AddWithValue("$id", id);
+        return Convert.ToInt32(q.ExecuteScalar()) > 0;
+    }
     public static void ResetAdminCredentialsToDefault()
     {
         Directory.CreateDirectory(Path.GetDirectoryName(DatabasePath)!);
@@ -148,7 +198,8 @@ public static class LegacyLoginMigration
         using var schema = c.CreateCommand();
         schema.CommandText = @"CREATE TABLE IF NOT EXISTS Users(
 Id TEXT PRIMARY KEY, Name TEXT NOT NULL UNIQUE, Role TEXT NOT NULL, PinHash TEXT,
-IsActive INTEGER NOT NULL DEFAULT 1, CreatedAt TEXT NOT NULL);";
+IsActive INTEGER NOT NULL DEFAULT 1, CreatedAt TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS AppMigrations(MigrationId TEXT PRIMARY KEY, AppliedAt TEXT NOT NULL);";
         schema.ExecuteNonQuery();
         EnsureColumn(c, "PinHash", "TEXT");
         EnsureColumn(c, "IsActive", "INTEGER NOT NULL DEFAULT 1");
