@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS JournalLines(Id INTEGER PRIMARY KEY AUTOINCREMENT,Ent
         AddColumn(c, "Invoices", "Status", "TEXT NOT NULL DEFAULT 'CLOSED'");
         AddColumn(c, "InvoiceLines", "UnitCost", "REAL NOT NULL DEFAULT 0");
         AddColumn(c, "Payments", "InvoiceId", "TEXT");
+        AddColumn(c, "Payments", "PaymentMethod", "TEXT NOT NULL DEFAULT 'CASH'");
         AddColumn(c, "Payments", "Currency", "TEXT NOT NULL DEFAULT 'SYP'");
         AddColumn(c, "Payments", "FundId", "TEXT NOT NULL DEFAULT 'MAIN-SYP'");
         AddColumn(c, "Payments", "Cancelled", "INTEGER NOT NULL DEFAULT 0");
