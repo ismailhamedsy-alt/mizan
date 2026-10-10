@@ -18,6 +18,7 @@ public partial class App
 
             if (HasArg(e, "--self-test-login")) { Shutdown(Services.LegacyLoginMigration.SelfTestLogin() ? 0 : 21); return; }
             if (HasArg(e, "--self-test-login-upgrade")) { Shutdown(Services.LegacyLoginMigration.SelfTestLoginUpgrade() ? 0 : 25); return; }
+            if (HasArg(e, "--self-test-arabic-pin")) { var pin = string.Concat((char)0x0661, (char)0x0662, (char)0x0663, (char)0x0664); Shutdown(new Services.EnterpriseAccountingService().Login("admin", pin) is { Role: "ADMIN" } ? 0 : 26); return; }
             if (HasArg(e, "--self-test-legacy-login")) { Shutdown(Services.LegacyLoginMigration.SelfTestLegacyLogin() ? 0 : 22); return; }
             if (HasArg(e, "--self-test-login-recovery")) { Shutdown(Services.LegacyLoginMigration.SelfTestLoginRecovery() ? 0 : 23); return; }
             if (HasArg(e, "--self-test-views")) { Shutdown(SelfTestViews() ? 0 : 24); return; }

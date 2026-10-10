@@ -20,6 +20,7 @@
                     <TextBlock Text="رمز الدخول (PIN)" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
                     <PasswordBox x:Name="Pin" Height="42" Margin="0,0,0,18"
                                  AutomationProperties.Name="رمز الدخول"/>
+                    <TextBlock Text="يمكن إدخال أرقام PIN بالأرقام العربية أو الإنجليزية." Foreground="#334155" Margin="2,0,2,12"/>
                     <Button Content="دخول إلى البرنامج" Click="Login_Click" Height="44" FontSize="16"
                             IsDefault="True" Margin="0,0,0,9"/>
                     <Button Content="استعادة دخول المدير إلى البيانات الافتراضية"
